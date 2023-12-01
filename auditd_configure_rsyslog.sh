@@ -181,7 +181,7 @@ check_connection() {
         exit 1
     fi
 }
-
+# Função para validar a saude do serviço
 health_check(){
 check_services # valida se os serviços estão em execução
 check_connection # valida se a comunicação é estabelecida com collector
@@ -197,7 +197,7 @@ main() {
     auditd_plugin_add # habilita o facility 6 no syslog para os eventos de auditd
     enable_auditd # habilitando o auditd
     restart_rsyslog_service # restart do rsyslog
-    health_check
+    health_check # 
     echo -e "\033[1;32m[OK] - Configurações realizadas com sucesso"
 }
 main
