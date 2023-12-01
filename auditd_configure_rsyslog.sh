@@ -65,7 +65,6 @@ auditd_install() {
     case "$os_type" in
         "ubuntu" | "debian")
             echo "[INFO] - Sistema operacional detectado: Ubuntu/Debian"
-            apt update
             apt install -y auditd
             ;;
         "centos" | "rhel")
