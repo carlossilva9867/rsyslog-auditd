@@ -8,10 +8,10 @@ VARIAVEL_IP="$1"
 check_parameter() {
 if [ -z "$VARIAVEL_IP" ];
     then 
-        echo "Por favor digite o IP do syslog remoto exemplo: ./auditd_configure_rsyslog.sh 10.0.0.0"
+        echo "[WARN] - Por favor digite o IP do syslog remoto exemplo: ./auditd_configure_rsyslog.sh 10.0.0.0"
         exit 1
     else 
-        echo "IP do syslog informado: $VARIAVEL_IP"
+        echo "[INFO] - IP do syslog informado: $VARIAVEL_IP"
     fi
 }
 
