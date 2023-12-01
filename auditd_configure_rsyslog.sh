@@ -174,9 +174,9 @@ check_connection() {
  port="514" # porta do syslog
     # Testar conexão TCP OU UDP
     if (echo >/dev/tcp/"$VARIAVEL_IP"/"$port" || echo >/dev/udp/"$VARIAVEL_IP"/"$port") 2>/dev/null; then
-        echo "[OK] - Conexão estabelecida com sucesso $1 porta $port"
+        echo "[OK] - Conexão estabelecida com sucesso $VARIAVEL_IP porta $port"
     else
-        echo "[ERROR] - Falha ao conectar nas portas $port usando TCP e UDP"
+        echo "[ERROR] - Falha ao conectar $VARIAVEL_IP nas portas $port usando TCP e UDP"
         exit 1
     fi
 }
