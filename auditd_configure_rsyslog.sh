@@ -145,6 +145,48 @@ enable_auditd() {
     echo "[ERROR] - Não foi possível determinar o tipo de init system."
   fi
 }
+# verificar se os serviços estão funcionando corretamente
+check_services() {
+    # Verificar o serviço Auditd (SystemD)
+    if command -v systemctl &> /dev/null && systemctl is-active --quiet auditd && systemctl is-enabled --quiet auditd; then
+        echo "[OK] - Serviço Auditd está em execução e configurado para iniciar na inicialização (SystemD)."
+    elif command -v service &> /dev/null && service auditd status | grep -q "active (running)"; then
+        echo "[OK] - Serviço Auditd está em execução (SystemV)."
+    else
+        echo "[ERROR] - Serviço Auditd não está em execução ou não está configurado corretamente."
+        exit 1
+    fi
+
+    # Verificar o serviço Rsyslog (SystemD)
+    if command -v systemctl &> /dev/null && systemctl is-active --quiet rsyslog && systemctl is-enabled --quiet rsyslog; then
+        echo "[OK] - Serviço Rsyslog está em execução e configurado para iniciar na inicialização (SystemD)."
+    elif command -v service &> /dev/null && service rsyslog status | grep -q "active (running)"; then
+        echo "[OK] - Serviço Rsyslog está em execução (SystemV)."
+    else
+        echo "[ERROR] - Serviço Rsyslog não está em execução ou não está configurado corretamente."
+        exit 1
+    fi
+}
+
+# teste conexão
+check_connection() {
+ local server="$1"
+ local port="514" # porta do syslog
+    # Testar conexão TCP OU UDP
+    if (echo >/dev/tcp/"$server"/"$port" || echo >/dev/udp/"$server"/"$port") 2>/dev/null; then
+        echo "[OK] - Conexão (TCP ou UDP) foi estabelecida com sucesso $1 porta $port"
+    else
+        echo "[ERROR] - Falha ao conectar nas portas $port usando TCP e UDP"
+        exit 1
+    fi
+}
+
+health_check(){
+check_services # valida se os serviços estão em execução
+check_connection # valida se a comunicação é estabelecida com collector
+
+
+}
 # Função principal
 main() {
     pre_requisitos # verificar os pre requisitos do sistema
@@ -155,5 +197,7 @@ main() {
     auditd_plugin_add # habilita o facility 6 no syslog para os eventos de auditd
     enable_auditd # habilitando o auditd
     restart_rsyslog_service # restart do rsyslog
+    health_check
+    echo -e "\033[1;32m[OK] - Configurações realizadas com sucesso"
 }
 main
