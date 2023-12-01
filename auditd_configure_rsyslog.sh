@@ -112,6 +112,11 @@ auditd_rules_add(){
     # Generic rule 
     curl -o /etc/audit/rules.d/soc.rules https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 }
+# Função para adicionar um plugin de syslog no auditd
+auditd_plugin_add(){
+    # Testado apenas em ubuntu
+    curl -o /etc/audit/plugins.d/collector.conf https://raw.githubusercontent.com/carlossilva9867/rsyslog-auditd/main/confs/audit/plguin-debian_syslog.conf
+}
 
 # Funcao para reiniciar e testar as configurações do auditd 
 enable_auditd() {
@@ -147,6 +152,7 @@ main() {
     rsyslog_configure # configuração do rsyslog com arquivo do coletor
     auditd_install # instalar o auditd
     auditd_rules_add # realizar a configuração das regras
+    auditd_plugin_add # habilita o facility 6 no syslog para os eventos de auditd
     enable_auditd # habilitando o auditd
     restart_rsyslog_service # restart do rsyslog
 }
