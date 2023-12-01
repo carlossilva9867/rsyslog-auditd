@@ -3,14 +3,24 @@
 # Versão 1.5
 # Autor: [Carlos Silva](https://github.com/carlossilva9867)
 # Envio de parametro exemplo ./scrit 1.1.1.1 
-export VARIAVEL_IP="$1"
+VARIAVEL_IP="$1"
+
+check_parameter() {
+if [ -z "$VARIAVEL_IP" ];
+    then 
+        echo "Por favor digite o IP do syslog remoto exemplo: ./auditd_configure_rsyslog.sh 10.0.0.0"
+        exit 1
+    else 
+        echo "IP do syslog informado: $VARIAVEL_IP"
+    fi
+}
 
 # Função para verificar se o script está sendo executado como root ou com sudo
 check_root() {
     if [ "$(id -u)" -ne 0 ]; then
         echo "[ERROR] - Este script precisa ser executado com privilégios de root ou sudo."
         exit 1
-    fi
+    fi    
 }
 
 # Função para verificar se o serviço do rsyslog está instalado
@@ -171,12 +181,13 @@ check_services() {
 
 # teste conexão
 check_connection() {
- port="514" # porta do syslog
-    # Testar conexão TCP OU UDP
-    if (echo >/dev/tcp/"$VARIAVEL_IP"/"$port" || echo >/dev/udp/"$VARIAVEL_IP"/"$port") 2>/dev/null; then
+    port="514"  # porta do syslog
+
+    # Tentar conexão TCP OU UDP com timeout de 5 segundos
+    if timeout 10s bash -c "(echo >/dev/tcp/"$VARIAVEL_IP"/"$port" || echo >/dev/udp/"$VARIAVEL_IP"/"$port")" 2>/dev/null; then
         echo "[OK] - Conexão estabelecida com sucesso $VARIAVEL_IP porta $port"
     else
-        echo "[ERROR] - Falha ao conectar $VARIAVEL_IP nas portas $port usando TCP e UDP"
+        echo "[ERROR] - Falha ao conectar $VARIAVEL_IP nas portas $port usando TCP e UDP dentro do limite de tempo."
         exit 1
     fi
 }
@@ -189,6 +200,7 @@ check_connection # valida se a comunicação é estabelecida com collector
 # Função principal
 main() {
     pre_requisitos # verificar os pre requisitos do sistema
+    check_parameter # checa se foi enviado um parametro
     backup_rsyslog_conf # backup dos arquivos de configuração do rsyslog
     rsyslog_configure # configuração do rsyslog com arquivo do coletor
     auditd_install # instalar o auditd
@@ -197,6 +209,6 @@ main() {
     enable_auditd # habilitando o auditd
     restart_rsyslog_service # restart do rsyslog
     health_check # 
-    echo -e "\033[1;32m[OK] - Configurações realizadas com sucesso"
+    echo -e "[OK] - Configurações realizadas com sucesso"
 }
-main
+main | tee execution.log
