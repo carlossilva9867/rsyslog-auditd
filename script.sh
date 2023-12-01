@@ -1,9 +1,8 @@
 #/bin/bash
-# Configuração do Rsyslog para Monitoramento de Eventos de Autenticação com Auditd
+# Configuração do Rsyslog para Monitoramento de Eventos com AUDITD
 # Versão 1.0
 # Autor: [Carlos Silva](https://github.com/carlossilva9867)
-
-# importando configurações do rsyslog definidos no arquivo .env
+# Envio de parametro exemplo ./scrit 1.1.1.1 
 VARIAVEL_IP="$1"
 
 # Função para verificar se o script está sendo executado como root ou com sudo
@@ -41,9 +40,8 @@ backup_rsyslog_conf() {
 pre_requisitos(){
     check_root
     check_rsyslog
-    #check_auditd
 }
---
+# Funcao para instalar o auditd em debian e redhat 7/8
 auditd_install() {
     local os_type=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
     local os_version=$(awk -F= '/^VERSION_ID=/{print $2}' /etc/os-release)
@@ -82,11 +80,11 @@ auditd_install() {
 
 # Função com as configurações do rsyslog
 rsyslog_configure() {
-    echo "local6.* @@$VARIAVEL_IP" >> /etc/rsyslog.conf
+    echo "local6.* @@$VARIAVEL_IP" >> /etc/rsyslog.d/001-collector.conf
 }
 
 # Função para reiniciar o serviço
-restart_service() {
+restart_rsyslog_service() {
     echo "[INFO] - Reiniciando o serviço rsyslog..."
     if command -v systemctl >/dev/null 2>&1; then
         systemctl restart rsyslog
@@ -109,19 +107,47 @@ restart_service() {
     fi
 }
 
-# Função com as configurações do auditd que será implementada na próxima versão
-auditd_configure() {
-  echo "[INFO] - Iniciando a configuração do auditd"
+# Função para adicionar as regras no auditd 
+auditd_rules_add(){
+    # Generic rule 
+    curl -o /etc/audit/rules.d/soc.rules https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 }
 
+# Funcao para reiniciar e testar as configurações do auditd 
+enable_auditd() {
+  # Verificar o tipo de init system
+  if command -v systemctl &> /dev/null && systemctl | grep -q '\-\.mount'; then
+    # Se o comando 'systemctl' existe e contém '-.mount', é Systemd
+    systemctl enable auditd
+    systemctl restart auditd
+
+    if systemctl is-active --quiet auditd; then
+      echo "[OK] - O auditd foi habilitado e reiniciado com sucesso (Systemd)."
+    else
+      echo "[ERROR] - Houve um problema aobackup_rsyslog_conf iniciar o auditd. Verifique os logs para mais informações (Systemd)."
+    fi
+  elif command -v service &> /dev/null; then
+    # Se o comando 'service' existe, é SystemV
+    service auditd enable
+    service auditd restart
+
+    if service auditd status | grep -q "active (running)"; then
+      echo "[OK] - O auditd foi habilitado e reiniciado com sucesso (SystemV)."
+    else
+      echo "[ERROR] - Houve um problema ao iniciar o auditd. Verifique os logs para mais informações (SystemV)."
+    fi
+  else
+    echo "[ERROR] - Não foi possível determinar o tipo de init system."
+  fi
+}
 # Função principal
 main() {
-    pre_requisitos
-    backup_rsyslog_conf
-    rsyslog_configure
-    auditd_install
-    restart_service
-
+    pre_requisitos # verificar os pre requisitos do sistema
+    backup_rsyslog_conf # backup dos arquivos de configuração do rsyslog
+    rsyslog_configure # configuração do rsyslog com arquivo do coletor
+    auditd_install # instalar o auditd
+    auditd_rules_add # realizar a configuração das regras
+    enable_auditd # habilitando o auditd
+    restart_rsyslog_service # restart do rsyslog
 }
-
 main
