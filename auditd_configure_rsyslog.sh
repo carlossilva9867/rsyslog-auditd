@@ -38,8 +38,8 @@ backup_rsyslog_conf() {
 
 # Função para verificar os pré-requisitos
 pre_requisitos(){
-    check_root
-    check_rsyslog
+    check_root # chama a funcao check root
+    check_rsyslog # chama a funcao check syslog 
 }
 # Funcao para instalar o auditd em debian e redhat 7/8
 auditd_install() {
