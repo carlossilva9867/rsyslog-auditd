@@ -112,6 +112,7 @@ auditd_rules_add(){
     # Generic rule 
     curl -o /etc/audit/rules.d/soc.rules https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 }
+
 # Função para adicionar um plugin de syslog no auditd
 auditd_plugin_add(){
     # Testado apenas em ubuntu
@@ -132,7 +133,7 @@ enable_auditd() {
       echo "[ERROR] - Houve um problema aobackup_rsyslog_conf iniciar o auditd. Verifique os logs para mais informações (Systemd)."
     fi
   elif command -v service &> /dev/null; then
-    # Se o comando 'service' existe, é SystemV
+    # Se o comando 'service' existe, é SystemV #{necessario validar}
     service auditd enable
     service auditd restart
 
@@ -170,11 +171,11 @@ check_services() {
 
 # teste conexão
 check_connection() {
- local server="$1"
- local port="514" # porta do syslog
+ server="$1"
+ port="514" # porta do syslog
     # Testar conexão TCP OU UDP
     if (echo >/dev/tcp/"$server"/"$port" || echo >/dev/udp/"$server"/"$port") 2>/dev/null; then
-        echo "[OK] - Conexão (TCP ou UDP) foi estabelecida com sucesso $1 porta $port"
+        echo "[OK] - Conexão estabelecida com sucesso $1 porta $port"
     else
         echo "[ERROR] - Falha ao conectar nas portas $port usando TCP e UDP"
         exit 1
@@ -184,9 +185,8 @@ check_connection() {
 health_check(){
 check_services # valida se os serviços estão em execução
 check_connection # valida se a comunicação é estabelecida com collector
-
-
 }
+
 # Função principal
 main() {
     pre_requisitos # verificar os pre requisitos do sistema
