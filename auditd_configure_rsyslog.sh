@@ -171,10 +171,9 @@ check_services() {
 
 # teste conexão
 check_connection() {
- server="$1"
  port="514" # porta do syslog
     # Testar conexão TCP OU UDP
-    if (echo >/dev/tcp/"$server"/"$port" || echo >/dev/udp/"$server"/"$port") 2>/dev/null; then
+    if (echo >/dev/tcp/"$VARIAVEL_IP"/"$port" || echo >/dev/udp/"$VARIAVEL_IP"/"$port") 2>/dev/null; then
         echo "[OK] - Conexão estabelecida com sucesso $1 porta $port"
     else
         echo "[ERROR] - Falha ao conectar nas portas $port usando TCP e UDP"
