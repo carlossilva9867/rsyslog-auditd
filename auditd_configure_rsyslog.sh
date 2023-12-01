@@ -1,6 +1,6 @@
 #/bin/bash
 # Configuração do Rsyslog para Monitoramento de Eventos com AUDITD
-# Versão 1.0
+# Versão 1.5
 # Autor: [Carlos Silva](https://github.com/carlossilva9867)
 # Envio de parametro exemplo ./scrit 1.1.1.1 
 VARIAVEL_IP="$1"
