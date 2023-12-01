@@ -115,7 +115,7 @@ auditd_rules_add(){
 
 # Função para adicionar um plugin de syslog no auditd
 auditd_plugin_add(){
-    # Testado apenas em ubuntu
+    # alterar para as regras com sucesso
     curl -o /etc/audit/plugins.d/collector.conf https://raw.githubusercontent.com/carlossilva9867/rsyslog-auditd/main/confs/audit/plguin-debian_syslog.conf
 }
 
