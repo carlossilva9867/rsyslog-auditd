@@ -89,7 +89,7 @@ auditd_install() {
 
 # Função com as configurações do rsyslog
 rsyslog_configure() {
-    echo "local6.* @@$VARIAVEL_IP" >> /etc/rsyslog.d/001-collector.conf
+    echo "local6.* @@$VARIAVEL_IP" > /etc/rsyslog.d/001-collector.conf
 }
 
 # Função para reiniciar o serviço
