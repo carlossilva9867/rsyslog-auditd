@@ -1,18 +1,18 @@
 #/bin/bash
 # Configuração do Rsyslog para Monitoramento de Eventos com AUDITD
 # Versão 2.1
-# Change log: Alterado para o bucket S3 - acessivel somente pela LIT 
+# Change log: Alterado para o bucket S3 - acessivel somente pela LIT
 # Stage: Testing
 # Autor: [Carlos Silva](https://github.com/carlossilva9867)
-# Envio de parametro exemplo ./scrit 1.1.1.1 
+# Envio de parametro exemplo ./scrit 1.1.1.1
 VARIAVEL_IP="$1"
 
 check_parameter() {
 if [ -z "$VARIAVEL_IP" ];
-    then 
+    then
         echo "[WARN] - Por favor digite o IP do syslog remoto exemplo: ./auditd_configure_rsyslog.sh 10.0.0.0"
         exit 1
-    else 
+    else
         echo "[INFO] - IP do syslog informado: $VARIAVEL_IP"
     fi
 }
@@ -22,7 +22,7 @@ check_root() {
     if [ "$(id -u)" -ne 0 ]; then
         echo "[ERROR] - Este script precisa ser executado com privilégios de root ou sudo."
         exit 1
-    fi    
+    fi
 }
 
 # Função para verificar se o serviço do rsyslog está instalado
@@ -51,7 +51,7 @@ backup_rsyslog_conf() {
 # Função para verificar os pré-requisitos
 pre_requisitos(){
     check_root # chama a funcao check root
-    check_rsyslog # chama a funcao check syslog 
+    check_rsyslog # chama a funcao check syslog
 }
 # Funcao para instalar o auditd em debian e redhat 7/8
 auditd_install() {
@@ -118,9 +118,9 @@ restart_rsyslog_service() {
     fi
 }
 
-# Função para adicionar as regras no auditd 
+# Função para adicionar as regras no auditd
 auditd_rules_add(){
-    # Generic rule 
+    # Generic rule
     curl -o /etc/audit/rules.d/logical.rules https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/logical.rules
 }
 
@@ -130,7 +130,7 @@ auditd_plugin_add(){
     curl -o /etc/audit/plugins.d/collector.conf https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/plguin-debian_syslog.conf
 }
 
-# Funcao para reiniciar e testar as configurações do auditd 
+# Funcao para reiniciar e testar as configurações do auditd
 enable_auditd() {
   # Verificar o tipo de init system
   if command -v systemctl &> /dev/null && systemctl | grep -q '\-\.mount'; then
@@ -209,7 +209,7 @@ main() {
     auditd_plugin_add # habilita o facility 6 no syslog para os eventos de auditd
     enable_auditd # habilitando o auditd
     restart_rsyslog_service # restart do rsyslog
-    health_check # 
+    health_check #
     echo -e "[OK] - Configurações realizadas com sucesso"
 }
 main | tee execution.log
