@@ -119,7 +119,7 @@ restart_rsyslog_service() {
 # Função para adicionar as regras no auditd 
 auditd_rules_add(){
     # Generic rule 
-    curl -o /etc/audit/rules.d/soc.rules https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
+    #curl -o /etc/audit/rules.d/soc.rules https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules
 }
 
 # Função para adicionar um plugin de syslog no auditd
