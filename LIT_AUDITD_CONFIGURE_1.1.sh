@@ -119,13 +119,13 @@ restart_rsyslog_service() {
 # Função para adicionar as regras no auditd 
 auditd_rules_add(){
     # Generic rule 
-    curl -o /etc/audit/rules.d/logical.rules https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/logical.rules
+    curl -o /etc/audit/rules.d/logical.rules "https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/logical.rules"
 }
 
 # Função para adicionar um plugin de syslog no auditd
 auditd_plugin_add(){
     # alterar para as regras com sucesso
-    curl -o curl -o /etc/audit/plugins.d/collector.conf https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/plguin-debian_syslog.con
+    curl -o /etc/audit/plugins.d/collector.conf "https://s3-auditd-data-useast1-prd-411646438324-scripts.s3.amazonaws.com/confs/audit/plguin-debian_syslog.conf"
 }
 
 # Funcao para reiniciar e testar as configurações do auditd 
