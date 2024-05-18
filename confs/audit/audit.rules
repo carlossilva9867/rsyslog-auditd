@@ -1,1 +1,57 @@
+# Este arquivo contém regras de auditoria para monitorar atividades específicas
 
+# Limpar regras anteriores
+-D
+
+# Definir buffer de auditoria
+-b 8192
+
+# Definir o modo de registro
+-f 1
+
+# Monitorar criação de usuários
+-w /etc/passwd -p wa -k create_user
+
+# Monitorar alterações no arquivo sudoers
+-w /etc/sudoers -p wa -k sudoers_changes
+
+# Monitorar manipulação de chaves SSH
+-w /home/admin/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /root/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/admnet/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/system/.ssh/authorized_keys -p war -k ssh_key_changes
+-w /home/oper/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/sprod/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/www/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/integ/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/stat/.ssh/authorized_keys -p wa -k ssh_key_changes
+-w /home/reference/.ssh/authorized_keys -p wa -k ssh_key_changes
+
+# Monitorar criação de serviços cron
+-w /etc/crontab -p wa -k cron_changes
+-w /etc/cron.d/ -p wa -k cron_changes
+-w /var/spool/cron/ -p wa -k cron_changes
+
+# Monitorar criação de serviços systemd
+-w /etc/systemd/system/ -p wa -k systemd_changes
+
+# Monitorar configurações de rede
+-a always,exit -F arch=ARCH -S sethostname -S setdomainname -k network_modifications
+-w /etc/issue -p wa -k network_modifications
+-w /etc/issue.net -p wa -k network_modifications
+-w /etc/hosts -p wa -k network_modifications
+-w /etc/sysconfig/network -p wa -k network_modifications
+
+# Monitoramento modulos do linux
+-w /sbin/insmod -p x -k modules_created
+-w /sbin/rmmod -p x -k modules_deleted
+-w /sbin/modprobe -p x -k modules_modifications
+-a always,exit -F arch=b64 -S init_module -S delete_module -k modules
+
+# Monitoramento de software utilizados para compilação
+-w /usr/bin/gcc -p x -k gcc_execution
+
+-a always,exit -F arch=b64 -S execve -C uid!=euid -k preload_detection
+
+# Monitoramento de conexão de rede
+-w inet_conn -S connect -d 172.16.254.251 -a exit,always
